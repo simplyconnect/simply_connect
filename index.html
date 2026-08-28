@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Simply Connect | Agent Sales Portal</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ======================= TOAST / ALERT CONTAINER ======================= -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <!-- ======================= LOADING OVERLAY ======================= -->
+  <div id="loadingOverlay" class="loading-overlay hidden">
+    <div class="spinner"></div>
+    <p id="loadingText">Loading&hellip;</p>
+  </div>
+
+  <!-- ======================= LOGIN SCREEN ======================= -->
+  <div id="loginScreen" class="screen login-screen">
+    <div class="login-card">
+      <div class="brand">
+        <img class="brand-logo" src="assets/logo.png" alt="Simply Connect logo">
+      </div>
+      <h1 class="login-title">Agent Sales Portal</h1>
+      <p class="login-subtitle">Select your name to sign in and submit a sale.</p>
+
+      <div class="field">
+        <label for="agentSearch">Agent Name</label>
+        <input
+          id="agentSearch"
+          type="text"
+          class="input"
+          placeholder="Start typing your name&hellip;"
+          autocomplete="off"
+          aria-describedby="agentListHelp">
+        <div id="agentDropdown" class="agent-dropdown hidden" role="listbox"></div>
+        <p id="agentListHelp" class="field-hint">150+ registered agents. Only agents on the approved roster can sign in.</p>
+      </div>
+
+      <button id="loginBtn" class="btn btn-primary btn-block" disabled>Sign In</button>
+    </div>
+    <footer class="login-footer">&copy; <span id="yearSpan"></span> Simply Connect. Internal use only.</footer>
+  </div>
+
+  <!-- ======================= APP SHELL (post-login) ======================= -->
+  <div id="appShell" class="screen app-shell hidden">
+
+    <!-- Top bar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <img class="topbar-logo" src="assets/logo.png" alt="Simply Connect">
+        <div class="topbar-divider"></div>
+        <div class="topbar-titles">
+          <span class="topbar-title">Agent Sales Submission</span>
+          <span class="topbar-subtitle" id="agentGreeting">Welcome</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <button id="historyBtn" class="btn btn-ghost">
+          <svg viewBox="0 0 24 24" class="icon"><path d="M13 3a9 9 0 1 0 9 9h-2a7 7 0 1 1-7-7V3zm.5 4H12v6l5.2 3.1.8-1.3-4.5-2.7V7z"/></svg>
+          History
+        </button>
+        <button id="logoutBtn" class="btn btn-outline">
+          <svg viewBox="0 0 24 24" class="icon"><path d="M16 13v-2H7V8l-5 4 5 4v-3zM20 3H10a2 2 0 0 0-2 2v4h2V5h10v14H10v-4H8v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z"/></svg>
+          Log Out
+        </button>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <div class="page-header">
+        <h1>New Sale Submission</h1>
+        <p>Fill in every field marked <span class="required-star">*</span>. Your submission is saved directly to Google Sheets.</p>
+      </div>
+
+      <form id="salesForm" class="card form-card" novalidate>
+
+        <!-- SECTION: Call Details -->
+        <section class="form-section">
+          <h2 class="section-title">Call Details</h2>
+          <div class="grid grid-2">
+            <div class="field">
+              <label for="campaignNumber">GRP/Campaign Number <span class="required-star">*</span></label>
+              <select id="campaignNumber" name="campaignNumber" class="input" required></select>
+            </div>
+            <div class="field">
+              <label>Agent Name</label>
+              <input type="text" id="agentNameDisplay" class="input" disabled>
+            </div>
+            <div class="field">
+              <label for="queueName">Call Received from Queue Name <span class="required-star">*</span></label>
+              <select id="queueName" name="queueName" class="input" required></select>
+            </div>
+            <div class="field">
+              <label for="team">Team <span class="required-star">*</span></label>
+              <select id="team" name="team" class="input" required></select>
+            </div>
+            <div class="field">
+              <label for="salesCallType">Sales Call / Non Sales Call <span class="required-star">*</span></label>
+              <select id="salesCallType" name="salesCallType" class="input" required>
+                <option value="">Select&hellip;</option>
+                <option>Sales Call</option>
+                <option>Non Sales Call</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION: Sale Details -->
+        <section class="form-section">
+          <h2 class="section-title">Sale Details</h2>
+          <div class="grid grid-2">
+            <div class="field">
+              <label for="previousServicesCancelled">Previous Services Cancelled <span class="required-star">*</span></label>
+              <select id="previousServicesCancelled" name="previousServicesCancelled" class="input" required>
+                <option value="">Select&hellip;</option>
+                <option>Yes</option>
+                <option>No</option>
+              </select>
+              <p class="field-hint">If "No", explain the provider's reason in Comments below.</p>
+            </div>
+            <div class="field">
+              <label for="saleProcessed">Sale Processed <span class="required-star">*</span></label>
+              <select id="saleProcessed" name="saleProcessed" class="input" required></select>
+            </div>
+            <div class="field">
+              <label for="leadGeneratedBy">Lead Generated By (If Any)</label>
+              <select id="leadGeneratedBy" name="leadGeneratedBy" class="input">
+                <option value="">N/A</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="currentProvider">Current Provider <span class="required-star">*</span></label>
+              <select id="currentProvider" name="currentProvider" class="input" required></select>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION: Customer Information -->
+        <section class="form-section">
+          <h2 class="section-title">Customer Information</h2>
+          <div class="grid grid-2">
+            <div class="field">
+              <label for="customerName">Customer Name <span class="required-star">*</span></label>
+              <input type="text" id="customerName" name="customerName" class="input" required>
+            </div>
+            <div class="field">
+              <label for="customerEmail">Customer E-mail <span class="required-star">*</span></label>
+              <input type="email" id="customerEmail" name="customerEmail" class="input" required>
+            </div>
+            <div class="field">
+              <label for="phoneNumber">Phone Number <span class="required-star">*</span></label>
+              <input type="tel" id="phoneNumber" name="phoneNumber" class="input" placeholder="(555) 555-5555" required>
+            </div>
+            <div class="field">
+              <label for="altPhoneNumber">Alternate Phone Number <span class="required-star">*</span></label>
+              <input type="tel" id="altPhoneNumber" name="altPhoneNumber" class="input" placeholder="(555) 555-5555" required>
+            </div>
+            <div class="field field-span-2">
+              <label for="customerAddress">Customer Address <span class="required-star">*</span></label>
+              <input type="text" id="customerAddress" name="customerAddress" class="input" required>
+            </div>
+            <div class="field">
+              <label for="state">State <span class="required-star">*</span></label>
+              <select id="state" name="state" class="input" required></select>
+            </div>
+            <div class="field">
+              <label for="zipCode">Zip Code <span class="required-star">*</span></label>
+              <input type="text" id="zipCode" name="zipCode" class="input" inputmode="numeric" placeholder="12345" required>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION: Order & Account -->
+        <section class="form-section">
+          <h2 class="section-title">Order &amp; Account</h2>
+          <div class="grid grid-2">
+            <div class="field">
+              <label for="ocn">Order Confirmation Number (OCN)</label>
+              <input type="text" id="ocn" name="ocn" class="input">
+            </div>
+            <div class="field">
+              <label for="workOrderNumber">Work Order Number <span class="required-star">*</span></label>
+              <input type="text" id="workOrderNumber" name="workOrderNumber" class="input" required>
+            </div>
+            <div class="field">
+              <label for="accountNumber">Account Number <span class="required-star">*</span></label>
+              <input type="text" id="accountNumber" name="accountNumber" class="input" required>
+            </div>
+            <div class="field">
+              <label for="provider">Provider <span class="required-star">*</span></label>
+              <select id="provider" name="provider" class="input" required></select>
+            </div>
+            <div class="field field-span-2">
+              <label>Services <span class="required-star">*</span></label>
+              <div id="servicesGroup" class="checkbox-group"></div>
+            </div>
+            <div class="field">
+              <label for="rgus">RGU's <span class="required-star">*</span></label>
+              <select id="rgus" name="rgus" class="input" required></select>
+            </div>
+            <div class="field">
+              <label for="installationType">Installation Type</label>
+              <select id="installationType" name="installationType" class="input">
+                <option value="">N/A</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="installationDate">Installation Date <span class="required-star">*</span></label>
+              <input type="date" id="installationDate" name="installationDate" class="input" required>
+            </div>
+            <div class="field">
+              <label for="installationTime">Installation Time</label>
+              <input type="time" id="installationTime" name="installationTime" class="input">
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION: Provider-Specific Details (dynamic, based on Provider selected above) -->
+        <section class="form-section">
+          <h2 class="section-title">Provider-Specific Details</h2>
+          <p id="providerDetailsEmpty" class="empty-state provider-empty">Select a Provider above to see any additional fields for it.</p>
+          <div id="providerFieldsGrid" class="grid grid-2 hidden"></div>
+        </section>
+
+        <!-- SECTION: Additional Details -->
+        <section class="form-section">
+          <h2 class="section-title">Additional Details</h2>
+          <div class="grid grid-2">
+            <div class="field">
+              <label for="thirdPartyStreaming">Any Third Party Streaming Services Sold <span class="required-star">*</span></label>
+              <select id="thirdPartyStreaming" name="thirdPartyStreaming" class="input" required>
+                <option value="">Select&hellip;</option>
+                <option>Yes</option>
+                <option>No</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="closerName">Closer Name <span class="required-star">*</span></label>
+              <select id="closerName" name="closerName" class="input" required></select>
+            </div>
+            <div class="field">
+              <label for="accountPin">Account Pin</label>
+              <input type="text" id="accountPin" name="accountPin" class="input">
+            </div>
+            <div class="field">
+              <label for="accountSecurityQuestion">Account Security Question</label>
+              <input type="text" id="accountSecurityQuestion" name="accountSecurityQuestion" class="input">
+            </div>
+            <div class="field field-span-2">
+              <label for="comments">Comments</label>
+              <textarea id="comments" name="comments" class="input textarea" rows="3"></textarea>
+            </div>
+            <div class="field field-span-2">
+              <label for="screenshot">Screenshot</label>
+              <input type="file" id="screenshot" name="screenshot" class="input file-input" accept="image/*">
+              <p class="field-hint">Optional. Upload a screenshot of the order confirmation (JPG/PNG, under 8MB). Saved to Drive automatically.</p>
+              <div id="screenshotPreview" class="screenshot-preview hidden"></div>
+            </div>
+          </div>
+        </section>
+
+        <div class="form-actions">
+          <button type="button" id="resetBtn" class="btn btn-outline">Clear Form</button>
+          <button type="submit" id="submitBtn" class="btn btn-primary">
+            <span id="submitBtnText">Submit Sale</span>
+          </button>
+        </div>
+      </form>
+    </main>
+
+    <footer class="app-footer">&copy; <span id="yearSpan2"></span> Simply Connect. Internal Agent Portal.</footer>
+  </div>
+
+  <!-- ======================= SUBMISSION HISTORY DRAWER ======================= -->
+  <div id="historyOverlay" class="drawer-overlay hidden">
+    <div class="drawer">
+      <div class="drawer-header">
+        <h2>My Submission History</h2>
+        <button id="closeHistoryBtn" class="icon-btn" aria-label="Close">&times;</button>
+      </div>
+      <div class="drawer-body">
+        <input id="historySearch" type="text" class="input" placeholder="Search by customer, account #, or submission ID&hellip;">
+        <div id="historyList" class="history-list">
+          <p class="empty-state">Loading your submissions&hellip;</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================= DUPLICATE CONFIRM MODAL ======================= -->
+  <div id="duplicateModal" class="modal-overlay hidden">
+    <div class="modal">
+      <h2>Possible Duplicate Submission</h2>
+      <p id="duplicateMessage"></p>
+      <div class="modal-actions">
+        <button id="duplicateCancelBtn" class="btn btn-outline">Go Back &amp; Edit</button>
+        <button id="duplicateConfirmBtn" class="btn btn-danger">Submit Anyway</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
