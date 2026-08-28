@@ -5,7 +5,7 @@
   // API CONFIG — point this at your deployed Google Apps Script Web App
   // (Deploy > New deployment > Web app > copy the "Web app URL").
   // =====================================================================
-  var API_URL = 'PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE';
+  var API_URL = 'https://script.google.com/macros/s/AKfycbyaiAKsUYzR31HctQjEKCjgjJvD9xnTDJ4ulTSFXdnMySxFwKPyFSJsF-VJGNwOY84/exec';
 
   var STORAGE_KEY = 'sc_agent_session';
   var CONFIG = null;
