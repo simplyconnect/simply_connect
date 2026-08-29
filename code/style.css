@@ -107,16 +107,18 @@
       radial-gradient(circle at 15% 15%, rgba(253, 185, 19, 0.15), transparent 45%),
       radial-gradient(circle at 85% 85%, rgba(242, 107, 33, 0.12), transparent 45%),
       var(--sc-dark);
+   background: #ffbf00;
   }
 
   .login-card {
     width: 100%;
-    max-width: 400px;
+    max-width: 477px;
     background: var(--sc-white);
-    border-radius: 16px;
-    padding: 40px 32px 32px;
+    border-radius: 15px;
+    padding: 133px 42px 186px;
     box-shadow: var(--sc-shadow-lg);
     text-align: center;
+
   }
 
   .brand-logo { height: 58px; }
