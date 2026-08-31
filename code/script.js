@@ -40,7 +40,8 @@
     return fetch(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
+      cache: 'no-store' // never let the browser reuse a cached response for a submit/validate call
     }).then(function (res) {
       if (!res.ok) throw new Error('Request failed with status ' + res.status);
       return res.json();
@@ -50,6 +51,18 @@
   // -------------------------------------------------------------------
   // BOOTSTRAP
   // -------------------------------------------------------------------
+  // If the browser restores this page from back-forward cache (e.g. the
+  // agent hits Back after submitting, or the tab was just backgrounded),
+  // the DOM can come back exactly as it was left instead of a fresh load —
+  // no DOMContentLoaded fires, so nothing above re-initializes. This is the
+  // classic cause of "works after a manual refresh, not before." Force a
+  // real reload whenever that happens so state is always fresh.
+  window.addEventListener('pageshow', function (event) {
+    if (event.persisted) {
+      window.location.reload();
+    }
+  });
+
   document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('yearSpan').textContent = new Date().getFullYear();
     document.getElementById('yearSpan2').textContent = new Date().getFullYear();
@@ -418,7 +431,23 @@
   }
 
   function resetForm() {
-    document.getElementById('salesForm').reset();
+    var form = document.getElementById('salesForm');
+    form.reset();
+
+    // Belt-and-braces: explicitly blank every field by hand instead of
+    // trusting native form.reset() alone. This guarantees a genuinely
+    // blank Installation Date (and everything else) for the next
+    // submission, even if a browser extension, autofill, or a restored
+    // bfcache page left stale values sitting in the DOM.
+    Array.prototype.forEach.call(form.elements, function (el) {
+      if (!el.name) return;
+      if (el.type === 'checkbox' || el.type === 'radio') {
+        el.checked = false;
+      } else if (el.type !== 'file') {
+        el.value = '';
+      }
+    });
+
     selectedServices = [];
     document.querySelectorAll('.checkbox-chip').forEach(function (chip) {
       chip.classList.remove('checked');
