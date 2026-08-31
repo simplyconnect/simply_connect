@@ -7,11 +7,12 @@
   // =====================================================================
   var API_URL = 'https://script.google.com/macros/s/AKfycbyaiAKsUYzR31HctQjEKCjgjJvD9xnTDJ4ulTSFXdnMySxFwKPyFSJsF-VJGNwOY84/exec';
 
-  var STORAGE_KEY = 'sc_agent_session';
+   var STORAGE_KEY = 'sc_agent_session';
   var CONFIG = null;
   var currentAgent = null;
   var selectedServices = [];
   var pendingSubmission = null; // holds payload while duplicate modal is open
+  var formInitialized = false;  // guards against rebuilding the form on a second login
 
   // ---------------------------------------------------------------------
   // API HELPERS
@@ -203,13 +204,24 @@
     document.getElementById('agentGreeting').textContent = 'Welcome, ' + agentName;
     document.getElementById('agentNameDisplay').value = agentName;
 
-    populateSelects();
-    setupServiceChips();
-    setupProviderFields();
-    setupScreenshotUpload();
-    setupFormEvents();
-    setupHistoryDrawer();
-    setupDuplicateModal();
+    if (!formInitialized) {
+      // Build the dropdowns, service chips, and every event listener exactly
+      // once per page load. Re-running these on a second login (e.g. after
+      // logout, without a page refresh) would append duplicate <option>s and
+      // duplicate chips into the same containers instead of replacing them.
+      populateSelects();
+      setupServiceChips();
+      setupProviderFields();
+      setupScreenshotUpload();
+      setupFormEvents();
+      setupHistoryDrawer();
+      setupDuplicateModal();
+      formInitialized = true;
+    } else {
+      // A different (or the same) agent logged back in without a page
+      // refresh — clear out anything the previous session left behind.
+      resetForm();
+    }
   }
 
   function populateSelects() {
@@ -228,6 +240,7 @@
 
   function fillSelect(id, options, required, placeholderText) {
     var select = document.getElementById(id);
+    select.innerHTML = ''; // guard against ever being called twice on the same select
     var placeholder = document.createElement('option');
     placeholder.value = '';
     placeholder.textContent = placeholderText || 'Select…';
@@ -242,6 +255,7 @@
 
   function setupServiceChips() {
     var group = document.getElementById('servicesGroup');
+    group.innerHTML = ''; // guard against ever being called twice
     CONFIG.services.forEach(function (service) {
       var label = document.createElement('label');
       label.className = 'checkbox-chip';
